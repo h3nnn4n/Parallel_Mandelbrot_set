@@ -1,9 +1,5 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <string.h>
-
 #include "types.h"
+#include "mandel.h"
 
 int process_point(double cx, double cy, int er, int bailout) {
     int    i;
@@ -60,6 +56,33 @@ void finish_block(int ix_min, int ix_max, int iy_min, int iy_max, _config c, int
     }
 }
 
+int check(int ix_min, int ix_max, int iy_min, int iy_max, _config c, int w, int color){
+    int iy, ix;
+    double cx, cy;
+
+    for(iy = iy_min; iy < iy_max; iy += w ){
+        cy = c.miny + iy*(c.maxy - c.miny) / c.screeny;
+
+        if ( process_point(c.minx + (ix_max) * (c.maxx - c.minx) / c.screenx, cy, c.er, c.bailout) != color )
+            return 0;
+
+        if ( process_point(c.minx + ( 0    ) * (c.maxx - c.minx) / c.screenx, cy, c.er, c.bailout) != color )
+            return 0;
+    }
+
+    for ( ix = ix_min; ix < ix_max; ix += w ) {
+        cx = c.minx + (ix_max) * (c.maxx - c.minx) / c.screenx;
+
+        if ( process_point(cx, c.miny + (iy_max) * (c.maxy - c.miny) / c.screeny, c.er, c.bailout) != color )
+            return 0;
+
+        if ( process_point(cx, c.miny + ( 0    ) * (c.maxy - c.miny) / c.screeny, c.er, c.bailout) != color )
+            return 0;
+    }
+
+    return 1;
+}
+
 void do_block(int ix_min, int ix_max, int iy_min, int iy_max, _config c, int *img) {
     if ( ix_max > c.screenx ) ix_max = c.screenx - 1;
     if ( iy_max > c.screeny ) iy_max = c.screeny - 1;
@@ -83,7 +106,8 @@ void do_block(int ix_min, int ix_max, int iy_min, int iy_max, _config c, int *im
     int ab = process_point(cx_min, cy_max, c.er, c.bailout);
     int ba = process_point(cx_max, cy_min, c.er, c.bailout);
 
-    if ( aa == bb  && aa == ab && aa == ba ) {
+    /*if ( aa == bb  && aa == ab && aa == ba ) {*/
+    if ( aa == bb  && aa == ab && aa == ba && check(ix_min, ix_max, iy_min, iy_max, c, 10, aa) ) {
         fill_block(ix_min, ix_max, iy_min, iy_max, c, img, aa);
     } else {
         if ( dx < eps && dy < eps ) {
@@ -101,61 +125,4 @@ void do_block(int ix_min, int ix_max, int iy_min, int iy_max, _config c, int *im
             do_block(ix_min     , ix_max - dx, iy_min + dy, iy_max     , c, img);
         }
     }
-}
-
-int main(){
-    int     block_size;
-    int     ix, iy,
-            i, j;
-    _config config;
-
-    FILE *img = fopen("mandel.ppm","wt");
-    _color col;
-    int *escapetime;
-
-    config.screenx  = 1920;
-    config.screeny  = 1080;
-    config.bailout  = 5000;
-    config.er       =  2;
-    config.minx     = -2.5;
-    config.maxx     =  1.5;
-    config.miny     = -2.0;
-    config.maxy     =  2.0;
-    block_size      =  200;
-
-    printf("%f \t %f\n%f\t %f\n", config.minx, config.maxx, config.miny, config.maxy);
-
-    escapetime  =  (int*)malloc(sizeof(int)*config.screenx*config.screeny);
-    fprintf(img, "P3\n%d %d\n255\n", config.screenx, config.screeny);
-
-    /*finish_block(0, config.screenx, 0, config.screeny, config, escapetime);*/
-
-    for ( iy = 0; iy < config.screeny; iy += block_size ) {
-        for ( ix = 0; ix < config.screenx; ix += block_size ) {
-            do_block(ix, ix+block_size-1, iy, iy+block_size-1, config, escapetime);
-        }
-        fprintf(stderr," -- %.2f%%\n",(iy/(double)config.screeny)*100.0);
-    }
-
-    fprintf(stderr," -- %.2f%%\n",100.0);
-    fprintf(stderr," <---- DONE ---->\n");
-    fprintf(stderr," Writing to disk!\n");
-
-    for(i = 0; i < config.screeny; i++){
-        for(j = 0; j < config.screenx; j++){
-            col.r = escapetime[i*config.screenx+j] % 256;
-            fprintf(img,"%d %d %d ",
-                    (int)col.r * 1,
-                    (int)col.r * 1,
-                    (int)col.r * 1);
-        }
-        fputc('\n',img);
-    }
-
-    fclose(img);
-    free(escapetime);
-
-    fprintf(stderr," -- Bye\n");
-
-    return EXIT_SUCCESS;
 }

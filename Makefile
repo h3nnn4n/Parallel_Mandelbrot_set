@@ -1,9 +1,9 @@
 CC=gcc
-CFLAGS=-c -Wall -Wextra -g
-CFLAGSL=
+CFLAGS=-c -Wall -Wextra -g -lpng
+CFLAGSL=-lpng
 LDFLAGS=
 
-SOURCES=mandelbrot.c
+SOURCES=mandel.c main.c image_utils.c
 
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=magic

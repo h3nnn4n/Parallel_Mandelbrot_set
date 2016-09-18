@@ -1,3 +1,6 @@
+#ifndef TYPES_H
+#define TYPES_H
+
 typedef struct {
         double r, g, b;
 } _color;
@@ -12,3 +15,6 @@ typedef struct {
            maxy,
            er;
 } _config;
+
+
+#endif /*  */
