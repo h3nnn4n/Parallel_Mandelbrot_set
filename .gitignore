@@ -1,0 +1,6 @@
+*ppm
+core
+a.out
+*.swp
+.*
+__pycache__
