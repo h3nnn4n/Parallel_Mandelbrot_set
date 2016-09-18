@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-c -Wall -Wextra -pedantic
+CFLAGS=-c -Wall -Wextra -g
 CFLAGSL=
 LDFLAGS=
 
