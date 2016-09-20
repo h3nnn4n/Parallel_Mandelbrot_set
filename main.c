@@ -29,8 +29,6 @@ int main(){
     escapetime = ( int   * ) malloc ( sizeof ( int    ) * config.screenx * config.screeny );
     bitmap     = ( _color* ) malloc ( sizeof ( _color ) * config.screenx * config.screeny );
 
-    /*finish_block(0, config.screenx, 0, config.screeny, config, escapetime);*/
-
     for ( iy = 0; iy < config.screeny; iy += block_size ) {
         for ( ix = 0; ix < config.screenx; ix += block_size ) {
             do_block(ix, ix+block_size-1, iy, iy+block_size-1, config, escapetime);

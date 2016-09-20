@@ -106,7 +106,6 @@ void do_block(int ix_min, int ix_max, int iy_min, int iy_max, _config c, int *im
     int ab = process_point(cx_min, cy_max, c.er, c.bailout);
     int ba = process_point(cx_max, cy_min, c.er, c.bailout);
 
-    /*if ( aa == bb  && aa == ab && aa == ba ) {*/
     if ( aa == bb  && aa == ab && aa == ba && check(ix_min, ix_max, iy_min, iy_max, c, 10, aa) ) {
         fill_block(ix_min, ix_max, iy_min, iy_max, c, img, aa);
     } else {
