@@ -66,17 +66,17 @@ int check(int ix_min, int ix_max, int iy_min, int iy_max, _config c, int w, int 
         if ( process_point(c.minx + (ix_max) * (c.maxx - c.minx) / c.screenx, cy, c.er, c.bailout) != color )
             return 0;
 
-        if ( process_point(c.minx + ( 0    ) * (c.maxx - c.minx) / c.screenx, cy, c.er, c.bailout) != color )
+        if ( process_point(c.minx + (ix_min) * (c.maxx - c.minx) / c.screenx, cy, c.er, c.bailout) != color )
             return 0;
     }
 
     for ( ix = ix_min; ix < ix_max; ix += w ) {
-        cx = c.minx + (ix_max) * (c.maxx - c.minx) / c.screenx;
+        cx = c.minx + (ix) * (c.maxx - c.minx) / c.screenx;
 
         if ( process_point(cx, c.miny + (iy_max) * (c.maxy - c.miny) / c.screeny, c.er, c.bailout) != color )
             return 0;
 
-        if ( process_point(cx, c.miny + ( 0    ) * (c.maxy - c.miny) / c.screeny, c.er, c.bailout) != color )
+        if ( process_point(cx, c.miny + (iy_min) * (c.maxy - c.miny) / c.screeny, c.er, c.bailout) != color )
             return 0;
     }
 
@@ -106,7 +106,7 @@ void do_block(int ix_min, int ix_max, int iy_min, int iy_max, _config c, int *im
     int ab = process_point(cx_min, cy_max, c.er, c.bailout);
     int ba = process_point(cx_max, cy_min, c.er, c.bailout);
 
-    if ( aa == bb  && aa == ab && aa == ba && check(ix_min, ix_max, iy_min, iy_max, c, 10, aa) ) {
+    if ( aa == bb  && aa == ab && aa == ba && check(ix_min, ix_max, iy_min, iy_max, c, 5, aa) ) {
         fill_block(ix_min, ix_max, iy_min, iy_max, c, img, aa);
     } else {
         if ( dx < eps && dy < eps ) {
