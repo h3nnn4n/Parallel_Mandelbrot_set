@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
+#include <omp.h>
 
 #include "types.h"
 #include "mandel.h"
@@ -22,13 +23,15 @@ int main(){
     config.maxx     =  1.5;
     config.miny     = -2.0;
     config.maxy     =  2.0;
-    block_size      =  200;
+    block_size      =  100;
 
     /*printf("%f \t %f\n%f\t %f\n", config.minx, config.maxx, config.miny, config.maxy);*/
 
     escapetime = ( int   * ) malloc ( sizeof ( int    ) * config.screenx * config.screeny );
     bitmap     = ( _color* ) malloc ( sizeof ( _color ) * config.screenx * config.screeny );
 
+/*#pragma omp parallel for private(ix, iy, config) shared(escapetime)*/
+#pragma omp parallel for private(ix)
     for ( iy = 0; iy < config.screeny; iy += block_size ) {
         for ( ix = 0; ix < config.screenx; ix += block_size ) {
             do_block(ix, ix+block_size-1, iy, iy+block_size-1, config, escapetime);
