@@ -18,11 +18,18 @@ int main(){
     config.screeny  = 1080;
     config.bailout  = 5000;
     config.er       =  2;
-    config.minx     = -2.5;
-    config.maxx     =  1.5;
-    config.miny     = -2.0;
-    config.maxy     =  2.0;
-    block_size      =  200;
+
+    /*config.minx     = -2.5;*/
+    /*config.maxx     =  1.5;*/
+    /*config.miny     = -2.0;*/
+    /*config.maxy     =  2.0;*/
+
+    config.minx     = -0.7436431355 - 0.000014628;
+    config.maxx     = -0.7436431355 + 0.000014628;
+    config.miny     =  0.131825963  - 0.000014628;
+    config.maxy     =  0.131825963  + 0.000014628;
+
+    block_size      =  100;
 
     /*printf("%f \t %f\n%f\t %f\n", config.minx, config.maxx, config.miny, config.maxy);*/
 
