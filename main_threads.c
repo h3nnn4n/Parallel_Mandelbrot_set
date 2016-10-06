@@ -35,7 +35,7 @@ void* feeder(void *data) {
     return NULL;
 }
 
-int main(){
+int main(int argc, char *argv[]) {
     int       block_size;
     int       ix, iy, i;
     int       *escapetime;
@@ -49,7 +49,12 @@ int main(){
     config.screeny  = 1080;
     config.bailout  = 5000;
     config.er       = 2;
-    nt              = 4;
+
+    if ( argc > 1 ) {
+        nt = atoi(argv[1]);
+    } else {
+        nt = 1;
+    }
 
     /*config.minx     = -2.5;*/
     /*config.maxx     =  1.5;*/

@@ -8,7 +8,7 @@
 #include "mandel.h"
 #include "image_utils.h"
 
-int main(){
+int main(int argc, char *argv[]) {
     int     block_size;
     int     ix, iy;
     int     *escapetime;
@@ -31,6 +31,10 @@ int main(){
     config.maxy     =  0.131825963  + 0.000014628;
 
     block_size      =  100;
+
+    if ( argc > 1 ) {
+        omp_set_num_threads(atoi(argv[1]));
+    }
 
     /*printf("%f \t %f\n%f\t %f\n", config.minx, config.maxx, config.miny, config.maxy);*/
 
