@@ -4,8 +4,10 @@
 
 for j in main_threads main_omp
 do
+    echo $j
     for i in `seq 1 16`
     do
+        echo $i
         for k in `seq 1 2`
         do
             /usr/bin/time -f '%e' -a -o time_${i}_${j} ./$j $i
