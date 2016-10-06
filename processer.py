@@ -4,7 +4,12 @@
 names = ["omp", "threads"]
 
 f = open("time_main")
-main = float(f.read().split('\n')[0])
+x = f.read().split('\n')[0]
+try:
+    main = float(x)
+except Exception:
+    print(x)
+
 f.close()
 
 for n in names:

@@ -8,7 +8,7 @@ do
     for i in `seq 1 16`
     do
         echo $i
-        for k in `seq 1 2`
+        for k in `seq 1 10`
         do
             /usr/bin/time -f '%e' -a -o time_${i}_${j} ./$j $i
         done
