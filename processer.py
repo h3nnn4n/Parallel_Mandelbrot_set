@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-names = ["omp", "threads"]
+names = ["omp_static", "omp_dynamic", "omp_guided", "threads"]
 
 f = open("time_main")
 x = f.read().split('\n')[0]

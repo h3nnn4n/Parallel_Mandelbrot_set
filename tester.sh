@@ -2,7 +2,7 @@
 
 /usr/bin/time -f '%e' -a -o time_main ./main
 
-for j in main_threads main_omp
+for j in main_threads main_omp_static main_omp_dynamic main_omp_guided
 do
     echo $j
     for i in `seq 1 16`

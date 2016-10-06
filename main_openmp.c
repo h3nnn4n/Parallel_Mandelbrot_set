@@ -8,6 +8,10 @@
 #include "mandel.h"
 #include "image_utils.h"
 
+#ifndef _SCHELL_
+#define _SCHELL_ static
+#endif
+
 int main(int argc, char *argv[]) {
     int     block_size;
     int     ix, iy;
@@ -42,7 +46,7 @@ int main(int argc, char *argv[]) {
     bitmap     = ( _color* ) malloc ( sizeof ( _color ) * config.screenx * config.screeny );
 
 /*#pragma omp parallel for private(ix, iy, config) shared(escapetime)*/
-#pragma omp parallel for private(ix)
+#pragma omp parallel for private(ix) schedule(_SCHELL_)
     for ( iy = 0; iy < config.screeny; iy += block_size ) {
         for ( ix = 0; ix < config.screenx; ix += block_size ) {
             do_block(ix, ix+block_size-1, iy, iy+block_size-1, config, escapetime);
