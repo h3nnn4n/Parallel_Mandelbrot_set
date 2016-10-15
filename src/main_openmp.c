@@ -29,12 +29,17 @@ int main(int argc, char *argv[]) {
     /*config.miny     = -2.0;*/
     /*config.maxy     =  2.0;*/
 
-    config.minx     = -0.7436431355 - 0.000014628;
-    config.maxx     = -0.7436431355 + 0.000014628;
-    config.miny     =  0.131825963  - 0.000014628;
-    config.maxy     =  0.131825963  + 0.000014628;
+    /*config.minx     = -0.7436431355 - 0.000014628;*/
+    /*config.maxx     = -0.7436431355 + 0.000014628;*/
+    /*config.miny     =  0.131825963  - 0.000014628;*/
+    /*config.maxy     =  0.131825963  + 0.000014628;*/
 
-    block_size      =  100;
+    config.minx     = -0.743643887037151 - 0.000000000051299;
+    config.maxx     = -0.743643887037151 + 0.000000000051299;
+    config.miny     =  0.131825904205330 - 0.000000000051299;
+    config.maxy     =  0.131825904205330 + 0.000000000051299;
+
+    block_size      =  20;
 
     if ( argc > 1 ) {
         omp_set_num_threads(atoi(argv[1]));
