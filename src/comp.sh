@@ -6,4 +6,4 @@ gcc mandel.c image_utils.c main_openmp.c  -o main_omp_guided  -lpng -fopenmp -D_
 
 gcc mandel.c image_utils.c main.c         -o main             -lpng
 
-gcc mandel.c image_utils.c main_threads.c -o main_threads     -lpng -lpthread
+gcc mandel.c image_utils.c main_pthreads.c -o main_threads    -lpng -lpthread
