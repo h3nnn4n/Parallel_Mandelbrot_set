@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
 #pragma omp parallel for private(ix) schedule(_SCHELL_)
     for ( iy = 0; iy < config.screeny; iy += block_size ) {
         for ( ix = 0; ix < config.screenx; ix += block_size ) {
-            do_block(ix, ix+block_size-1, iy, iy+block_size-1, config, escapetime);
+            do_block(ix, ix+block_size, iy, iy+block_size, config, escapetime);
         }
         /*fprintf(stderr," -- %.2f%%\n",(iy/(double)config.screeny)*100.0);*/
     }
