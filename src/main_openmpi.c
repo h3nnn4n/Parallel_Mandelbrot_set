@@ -19,6 +19,9 @@ int main(int argc, char *argv[]) {
 
     config.screenx  = 1920;
     config.screeny  = 1080;
+
+    config.screenx  = 100;
+    config.screeny  = 100;
     config.bailout  = 5000;
     config.er       =  2;
 
@@ -49,66 +52,79 @@ int main(int argc, char *argv[]) {
     escapetime = ( int   * ) malloc ( sizeof ( int    ) * config.screenx * config.screeny );
     bitmap     = ( _color* ) malloc ( sizeof ( _color ) * config.screenx * config.screeny );
 
-    printf("%d is up, %d total\n", rank, size);
+    /*printf("%d is up, %d total\n", rank, size);*/
 
     if ( rank == 0 ) {
         int counter = size-1;
-        int size = sizeof(int   ) * 4 // Block coordinates
-                 + sizeof(double) * 5 // Image complex coordinates + ER
-                 + sizeof(int   ) * 3 // Screen size (pixels) + bailout
-                 + sizeof(int   )    ;// Suicide flag;
-        void *outbuf = malloc ( size );
+        int data_size = sizeof(int   ) * 4 // Block coordinates
+                      + sizeof(double) * 5 // Image complex coordinates + ER
+                      + sizeof(int   ) * 3 // Screen size (pixels) + bailout
+                      + sizeof(int   )     // Suicide flag;
+                      + sizeof(int   ) * 0;// Gambi
+        void *outbuf = malloc ( data_size );
+
         for ( iy = 0; iy < config.screeny; iy += block_size ) {
             for ( ix = 0; ix < config.screenx; ix += block_size ) {
                 int position = 0;
-                int    tmp;
+                int tmp;
 
-                printf("Packing ");
+                /*printf("Packing ");*/
+
+                tmp = 1;
+                MPI_Pack(&tmp           , 1, MPI_INT   , outbuf, data_size, &position, MPI_COMM_WORLD);
 
                 tmp = ix;
-                printf("%d ", tmp);
-                MPI_Pack(&tmp           , 1, MPI_INT   , outbuf, size, &position, MPI_COMM_WORLD);
+                /*printf("%d ", tmp);*/
+                MPI_Pack(&tmp           , 1, MPI_INT   , outbuf, data_size, &position, MPI_COMM_WORLD);
 
                 tmp = ix+block_size-1;
-                printf("%d ", tmp);
-                MPI_Pack(&tmp           , 1, MPI_INT   , outbuf, size, &position, MPI_COMM_WORLD);
+                /*printf("%d ", tmp);*/
+                MPI_Pack(&tmp           , 1, MPI_INT   , outbuf, data_size, &position, MPI_COMM_WORLD);
 
                 tmp = iy;
-                printf("%d ", tmp);
-                MPI_Pack(&tmp           , 1, MPI_INT   , outbuf, size, &position, MPI_COMM_WORLD);
+                /*printf("%d ", tmp);*/
+                MPI_Pack(&tmp           , 1, MPI_INT   , outbuf, data_size, &position, MPI_COMM_WORLD);
 
                 tmp = iy+block_size-1;
-                printf("%d ", tmp);
-                MPI_Pack(&tmp           , 1, MPI_INT   , outbuf, size, &position, MPI_COMM_WORLD);
-                printf("\n");
+                /*printf("%d ", tmp);*/
+                MPI_Pack(&tmp           , 1, MPI_INT   , outbuf, data_size, &position, MPI_COMM_WORLD);
+                /*printf("\n");*/
 
-                MPI_Pack(&config.minx   , 1, MPI_DOUBLE, outbuf, size, &position, MPI_COMM_WORLD);
-                MPI_Pack(&config.maxx   , 1, MPI_DOUBLE, outbuf, size, &position, MPI_COMM_WORLD);
-                MPI_Pack(&config.miny   , 1, MPI_DOUBLE, outbuf, size, &position, MPI_COMM_WORLD);
-                MPI_Pack(&config.maxy   , 1, MPI_DOUBLE, outbuf, size, &position, MPI_COMM_WORLD);
-                MPI_Pack(&config.er     , 1, MPI_DOUBLE, outbuf, size, &position, MPI_COMM_WORLD);
+                MPI_Pack(&config.minx   , 1, MPI_DOUBLE, outbuf, data_size, &position, MPI_COMM_WORLD);
+                MPI_Pack(&config.maxx   , 1, MPI_DOUBLE, outbuf, data_size, &position, MPI_COMM_WORLD);
+                MPI_Pack(&config.miny   , 1, MPI_DOUBLE, outbuf, data_size, &position, MPI_COMM_WORLD);
+                MPI_Pack(&config.maxy   , 1, MPI_DOUBLE, outbuf, data_size, &position, MPI_COMM_WORLD);
+                MPI_Pack(&config.er     , 1, MPI_DOUBLE, outbuf, data_size, &position, MPI_COMM_WORLD);
 
-                MPI_Pack(&config.bailout, 1, MPI_INT   , outbuf, size, &position, MPI_COMM_WORLD);
-                MPI_Pack(&config.screenx, 1, MPI_INT   , outbuf, size, &position, MPI_COMM_WORLD);
-                MPI_Pack(&config.screeny, 1, MPI_INT   , outbuf, size, &position, MPI_COMM_WORLD);
-
-                tmp = -1;
-                MPI_Pack(&tmp           , 1, MPI_INT   , outbuf, size, &position, MPI_COMM_WORLD);
+                MPI_Pack(&config.bailout, 1, MPI_INT   , outbuf, data_size, &position, MPI_COMM_WORLD);
+                MPI_Pack(&config.screenx, 1, MPI_INT   , outbuf, data_size, &position, MPI_COMM_WORLD);
+                MPI_Pack(&config.screeny, 1, MPI_INT   , outbuf, data_size, &position, MPI_COMM_WORLD);
 
                 if ( counter > 0 ) {
                     MPI_Send(outbuf, position, MPI_PACKED, counter, 0, MPI_COMM_WORLD);
-                    printf("%d sent to %d\n", rank, counter);
+                    /*printf("%d sent to %d\n", rank, counter);*/
                     counter--;
                 } else {
                     /*do_block(ix, ix+block_size-1, iy, iy+block_size-1, config, escapetime);*/
                     int d = -1;
+                    /*printf("\n> master is waiting\n");*/
                     MPI_Recv(&d    , 1, MPI_INT   , MPI_ANY_SOURCE   , 0, MPI_COMM_WORLD, &status);
-                    printf("master got %f\n", d);
-                    MPI_Send(outbuf, 1, MPI_PACKED, status.MPI_SOURCE, 0, MPI_COMM_WORLD         );
-                    printf("> %d sent to %d\n", rank, status.MPI_SOURCE);
+                    /*printf("> master got %d\n", d);*/
+                    MPI_Send(outbuf, position, MPI_PACKED, status.MPI_SOURCE, 0, MPI_COMM_WORLD         );
+                    /*printf("> %d sent to %d\n", rank, status.MPI_SOURCE);*/
                 }
             }
             /*fprintf(stderr," -- %.2f%%\n",(iy/(double)config.screeny)*100.0);*/
+        }
+
+        int tmp = 0;
+        int position = 0;
+        MPI_Pack(&tmp, 1, MPI_INT, outbuf, size, &position, MPI_COMM_WORLD);
+
+        int cc;
+        for ( cc = size - 1; cc > 0 ; cc-- ) {
+            printf(" ==> Sending kill to %d %d\n", cc, position);
+            MPI_Send(outbuf, position, MPI_PACKED, cc, 0, MPI_COMM_WORLD);
         }
     } else {
         int size = sizeof(int   ) * 4 // Block coordinates
@@ -116,36 +132,43 @@ int main(int argc, char *argv[]) {
                  + sizeof(int   ) * 3 // Screen size (pixels) + bailout
                  + sizeof(int   )    ;// Suicide flag;
         void *inbuf = malloc ( size );
-        int position = 0;
+        int flag = 1;
+        int counter = 0;
+        while( flag ) {
+            counter++;
+            int position = 0;
 
-        int a1, a2, a3, a4, flag;
-        _config config;
+            int a1, a2, a3, a4;
+            _config config;
 
-        printf("%d is waiting\n", rank);
-        MPI_Recv(inbuf, size, MPI_PACKED, 0, 0, MPI_COMM_WORLD, &status);
+            /*printf("%d is waiting\n", rank);*/
+            MPI_Recv(inbuf, size, MPI_PACKED, 0, 0, MPI_COMM_WORLD, &status);
 
-        MPI_Unpack(inbuf, size, &position, &a1            , 1, MPI_INT   , MPI_COMM_WORLD);
-        MPI_Unpack(inbuf, size, &position, &a2            , 1, MPI_INT   , MPI_COMM_WORLD);
-        MPI_Unpack(inbuf, size, &position, &a3            , 1, MPI_INT   , MPI_COMM_WORLD);
-        MPI_Unpack(inbuf, size, &position, &a4            , 1, MPI_INT   , MPI_COMM_WORLD);
+            MPI_Unpack(inbuf, size, &position, &flag          , 1, MPI_INT   , MPI_COMM_WORLD);
 
-        MPI_Unpack(inbuf, size, &position, &config.minx   , 1, MPI_DOUBLE, MPI_COMM_WORLD);
-        MPI_Unpack(inbuf, size, &position, &config.maxx   , 1, MPI_DOUBLE, MPI_COMM_WORLD);
-        MPI_Unpack(inbuf, size, &position, &config.miny   , 1, MPI_DOUBLE, MPI_COMM_WORLD);
-        MPI_Unpack(inbuf, size, &position, &config.maxy   , 1, MPI_DOUBLE, MPI_COMM_WORLD);
-        MPI_Unpack(inbuf, size, &position, &config.er     , 1, MPI_DOUBLE, MPI_COMM_WORLD);
+            if ( !flag ) continue;
 
-        MPI_Unpack(inbuf, size, &position, &config.bailout, 1, MPI_INT   , MPI_COMM_WORLD);
-        MPI_Unpack(inbuf, size, &position, &config.screenx, 1, MPI_INT   , MPI_COMM_WORLD);
-        MPI_Unpack(inbuf, size, &position, &config.screeny, 1, MPI_INT   , MPI_COMM_WORLD);
+            MPI_Unpack(inbuf, size, &position, &a1            , 1, MPI_INT   , MPI_COMM_WORLD);
+            MPI_Unpack(inbuf, size, &position, &a2            , 1, MPI_INT   , MPI_COMM_WORLD);
+            MPI_Unpack(inbuf, size, &position, &a3            , 1, MPI_INT   , MPI_COMM_WORLD);
+            MPI_Unpack(inbuf, size, &position, &a4            , 1, MPI_INT   , MPI_COMM_WORLD);
 
-        MPI_Unpack(inbuf, size, &position, &flag          , 1, MPI_INT   , MPI_COMM_WORLD);
+            MPI_Unpack(inbuf, size, &position, &config.minx   , 1, MPI_DOUBLE, MPI_COMM_WORLD);
+            MPI_Unpack(inbuf, size, &position, &config.maxx   , 1, MPI_DOUBLE, MPI_COMM_WORLD);
+            MPI_Unpack(inbuf, size, &position, &config.miny   , 1, MPI_DOUBLE, MPI_COMM_WORLD);
+            MPI_Unpack(inbuf, size, &position, &config.maxy   , 1, MPI_DOUBLE, MPI_COMM_WORLD);
+            MPI_Unpack(inbuf, size, &position, &config.er     , 1, MPI_DOUBLE, MPI_COMM_WORLD);
 
-        printf("%d got %d %d %d %d %d\n", rank, a1, a2, a3, a4, flag);
-        /*do_block(a1, a2, a3, a4, config, escapetime);*/
+            MPI_Unpack(inbuf, size, &position, &config.bailout, 1, MPI_INT   , MPI_COMM_WORLD);
+            MPI_Unpack(inbuf, size, &position, &config.screenx, 1, MPI_INT   , MPI_COMM_WORLD);
+            MPI_Unpack(inbuf, size, &position, &config.screeny, 1, MPI_INT   , MPI_COMM_WORLD);
 
-        int d = 0;
-        MPI_Send(&d, 1, MPI_INT, status.MPI_SOURCE, 0, MPI_COMM_WORLD );
+            /*printf("%d got %d %d %d %d %d\n", rank, a1, a2, a3, a4, flag);*/
+            /*do_block(a1, a2, a3, a4, config, escapetime);*/
+
+            int d = counter;
+            MPI_Send(&d, 1, MPI_INT, status.MPI_SOURCE, 0, MPI_COMM_WORLD );
+        }
     }
 
 
