@@ -38,6 +38,8 @@ void fill_block(int ix_min, int ix_max, int iy_min, int iy_max, _config c, int *
     int y = iy_min;
     for (; ix_min <= ix_max; ++ix_min) {
         for (iy_min = y; iy_min <= iy_max; ++iy_min) {
+            if ( iy_min >= c.screeny ) continue;
+            if ( ix_min >= c.screenx ) continue;
             img[ iy_min * c.screenx + ix_min ] = aa;
         }
     }
