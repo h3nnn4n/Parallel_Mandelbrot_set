@@ -5,7 +5,7 @@ LDFLAGS=
 PTHREAD_FLAG=-pthread
 OPENMP_FLAG=-fopenmp
 
-SOURCES=mandel.c image_utils.c
+SOURCES=mandel.c image_utils.c mandel_processor.c
 EXECUTABLES=main main_pthreads main_openmp
 ALLSOURCES=mandel.c image_utils.c main.c main_pthreads.c main_openmp.c
 
