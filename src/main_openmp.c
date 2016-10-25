@@ -4,6 +4,8 @@
 #include <string.h>
 #include <omp.h>
 
+#include <gmp.h>
+
 #include "types.h"
 #include "mandel.h"
 #include "image_utils.h"
@@ -20,6 +22,13 @@ int main(int argc, char *argv[]) {
     _config config;
     _color  *bitmap;
 
+    mpf_t   minx, miny, maxx, maxy;
+
+    mpf_set_default_prec(1024);
+
+    mpf_init(minx);mpf_init(miny);
+    mpf_init(maxx);mpf_init(maxy);
+
     config.screenx  = 1920;
     config.screeny  = 1080;
     config.bailout  = 5000;
@@ -35,10 +44,15 @@ int main(int argc, char *argv[]) {
     /*config.miny     =  0.131825963  - 0.000014628;*/
     /*config.maxy     =  0.131825963  + 0.000014628;*/
 
-    config.minx     = -0.743643887037151 - 0.000000000051299;
-    config.maxx     = -0.743643887037151 + 0.000000000051299;
-    config.miny     =  0.131825904205330 - 0.000000000051299;
-    config.maxy     =  0.131825904205330 + 0.000000000051299;
+    /*config.minx     = -0.743643887037151 - 0.000000000051299;*/
+    /*config.maxx     = -0.743643887037151 + 0.000000000051299;*/
+    /*config.miny     =  0.131825904205330 - 0.000000000051299;*/
+    /*config.maxy     =  0.131825904205330 + 0.000000000051299;*/
+
+    mpf_set_d( config.minx, -0.743643135 - 0.00012068 / 64.0 );
+    mpf_set_d( config.maxx, -0.743643135 + 0.00012068 / 64.0 );
+    mpf_set_d( config.miny,  0.131825963 - 0.00012068 / 64.0 );
+    mpf_set_d( config.maxy,  0.131825963 + 0.00012068 / 64.0 );
 
     block_size      =  32;
     max             =  0;
