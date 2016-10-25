@@ -2,35 +2,53 @@
 #include "mandel.h"
 #include "mandel_processor.h"
 
-int process_point(double cx, double cy, int er, int bailout) {
-    int    i;
-    double zx , zxn , zy , zyn;
-    double zx2, zxn2, zy2, zyn2;
+#include <gmp.h>
 
-    zx  = 0.0;
-    zy  = 0.0;
-    zx2 = 0.0;
-    zy2 = 0.0;
+int process_point(mpf_t cx,mpf_t cy, int er, int bailout){
+    mpf_t zx,zy,zxn,zyn,
+          zx2,zy2,
+          zx2_fast,t1;
+    int   i,k;
 
-    for ( i = 0; i < bailout; i++ ){
-        zxn = zx * zx - zy * zy + cx;
-        zyn = 2.0 * zx * zy + cy;
-        zx  = zxn; zy  = zyn;
+    mpf_init  ( zx      ) ;
+    mpf_init  ( zy      ) ;
+    mpf_init  ( t1      ) ;
+    mpf_init  ( zxn     ) ;
+    mpf_init  ( zyn     ) ;
+    mpf_init  ( zx2     ) ;
+    mpf_init  ( zy2     ) ;
 
-        zxn = zx * zx - zy * zy + cx;
-        zyn = 2.0 * zx * zy + cy;
-        zx  = zxn; zy  = zyn;
+    mpf_set_d ( zx, 0.0 ) ;
+    mpf_set_d ( zy, 0.0 ) ;
 
-        zxn2 = zx2 * zx2 - zy2 * zy2 + cx;
-        zyn2 = 2.0 * zx2 * zy2 + cy;
-        zx2  = zxn2; zy2  = zyn2;
+    for (int i = 0; i < bailout; ++i) {
+        mpf_mul    ( zx2, zx , zx  ) ;
+        mpf_mul    ( zy2, zy , zy  ) ;
+        mpf_sub    ( zxn, zx2, zy2 ) ;
+        mpf_add    ( zxn, zxn, cx  ) ;
 
-        if ( zx2 == zx && zy2 == zy )
-            return 0;
+        mpf_mul_ui ( zyn, zx , 2   ) ;
+        mpf_mul    ( zyn, zyn, zy  ) ;
+        mpf_add    ( zyn, zyn, cy  ) ;
 
-        if ( zx * zx + zy * zy > er * er )
-            return i;
+        mpf_set    ( zx , zxn      ) ;
+        mpf_set    ( zy , zyn      ) ;
+
+        mpf_add    ( t1 , zx2, zy2 ) ;
+
+        k = mpf_cmp_d( t1, er * er ) ;
+
+        if( k > 0 )
+            break;
     }
 
-    return 0;
+    mpf_clear( zx  );
+    mpf_clear( zy  );
+    mpf_clear( t1  );
+    mpf_clear( zxn );
+    mpf_clear( zyn );
+    mpf_clear( zx2 );
+    mpf_clear( zy2 );
+
+    return i;
 }
