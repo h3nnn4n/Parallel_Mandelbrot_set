@@ -14,6 +14,9 @@ int main(int argc, char *argv[]) {
     int     ix, iy;
     int     *escapetime;
     int     rank, size;
+
+    double  start_time, end_time;
+
     _config config;
     _color  *bitmap;
 
@@ -58,6 +61,7 @@ int main(int argc, char *argv[]) {
         void *outbuf =        malloc ( data_size                                               );
         int  *block  = (int*) malloc ( sizeof(int) * 4 + sizeof(int) * block_size * block_size );
 
+        start_time = MPI_Wtime();
         for ( iy = 0; iy < config.screeny; iy += block_size ) {
             for ( ix = 0; ix < config.screenx; ix += block_size ) {
                 int position = 0;
@@ -92,7 +96,7 @@ int main(int argc, char *argv[]) {
                     MPI_Send(outbuf, position, MPI_PACKED, counter, 0, MPI_COMM_WORLD);
                     counter--;
                 } else {
-                    MPI_Recv(block, 4 * block_size*block_size, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
+                    MPI_Recv(block, 4 + block_size*block_size, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
 
                     int ii, jj;
 
@@ -121,13 +125,15 @@ int main(int argc, char *argv[]) {
                                            (double)config.screeny)*100.0);
         }
 
+        fprintf(stderr, "Waiting the remaining workers\n");
+
         int cc;
         for (cc = 1; cc < size; cc++) {
             int tmp = 0;
             int position = 0;
             MPI_Pack(&tmp, 1, MPI_INT, outbuf, data_size, &position, MPI_COMM_WORLD);
             MPI_Send(outbuf, position, MPI_PACKED, cc, 0, MPI_COMM_WORLD);
-            MPI_Recv(block, 4 * block_size*block_size, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
+            MPI_Recv(block, 4 + block_size*block_size, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
 
             int ii, jj;
 
@@ -149,8 +155,11 @@ int main(int argc, char *argv[]) {
                 }
             }
         }
+        end_time = MPI_Wtime();
 
-        MPI_Barrier(MPI_COMM_WORLD);
+        /*MPI_Barrier(MPI_COMM_WORLD);*/
+
+        printf("%d %f\n", size, end_time - start_time);
 
         for ( iy = 0; iy < config.screeny; iy++ ) {
             for ( ix = 0; ix < config.screenx; ix++ ) {
@@ -225,7 +234,7 @@ int main(int argc, char *argv[]) {
 
             MPI_Send(block, 4 + block_size * block_size, MPI_INT, status.MPI_SOURCE, 0, MPI_COMM_WORLD );
         }
-        MPI_Barrier(MPI_COMM_WORLD);
+        /*MPI_Barrier(MPI_COMM_WORLD);*/
     }
 
     MPI_Finalize();
