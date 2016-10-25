@@ -5,10 +5,9 @@
 #include <gmp.h>
 
 int process_point(mpf_t cx,mpf_t cy, int er, int bailout){
-    mpf_t zx,zy,zxn,zyn,
-          zx2,zy2,
-          zx2_fast,t1;
-    int   i,k;
+    mpf_t zx , zy , zxn, zyn,
+          zx2, zy2, t1;
+    int   i  , k;
 
     mpf_init  ( zx      ) ;
     mpf_init  ( zy      ) ;
@@ -21,7 +20,7 @@ int process_point(mpf_t cx,mpf_t cy, int er, int bailout){
     mpf_set_d ( zx, 0.0 ) ;
     mpf_set_d ( zy, 0.0 ) ;
 
-    for (int i = 0; i < bailout; ++i) {
+    for (i = 0; i < bailout; ++i) {
         mpf_mul    ( zx2, zx , zx  ) ;
         mpf_mul    ( zy2, zy , zy  ) ;
         mpf_sub    ( zxn, zx2, zy2 ) ;
