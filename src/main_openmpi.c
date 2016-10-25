@@ -125,6 +125,8 @@ int main(int argc, char *argv[]) {
                                            (double)config.screeny)*100.0);
         }
 
+        fprintf(stderr, "Waiting the remaining workers\n");
+
         int cc;
         for (cc = 1; cc < size; cc++) {
             int tmp = 0;
@@ -157,7 +159,7 @@ int main(int argc, char *argv[]) {
 
         /*MPI_Barrier(MPI_COMM_WORLD);*/
 
-        printf("%d %f", size, end_time - start_time);
+        printf("%d %f\n", size, end_time - start_time);
 
         for ( iy = 0; iy < config.screeny; iy++ ) {
             for ( ix = 0; ix < config.screenx; ix++ ) {
