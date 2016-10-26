@@ -14,6 +14,7 @@ int main(int argc, char *argv[]) {
     int     ix, iy;
     int     *escapetime;
     int     rank, size;
+    int     max;
 
     double  start_time, end_time;
 
@@ -42,6 +43,7 @@ int main(int argc, char *argv[]) {
     config.maxy     =  0.131825904205330 + 0.000000000051299;
 
     block_size      =  79;
+    max             =  0;
 
     MPI_Status status;
     MPI_Init(&argc, &argv);
@@ -113,6 +115,7 @@ int main(int argc, char *argv[]) {
                                 continue;
                             } else {
                                 escapetime[ jj * config.screenx + ii] =  block[copier];
+                                max = block[copier] < max ? max : block[copier];
                                 copier++;
                             }
                         }
@@ -150,6 +153,7 @@ int main(int argc, char *argv[]) {
                         continue;
                     } else {
                         escapetime[ jj * config.screenx + ii] =  block[copier];
+                        max = block[copier] < max ? max : block[copier];
                         copier++;
                     }
                 }
@@ -163,9 +167,9 @@ int main(int argc, char *argv[]) {
 
         for ( iy = 0; iy < config.screeny; iy++ ) {
             for ( ix = 0; ix < config.screenx; ix++ ) {
-                bitmap[iy * config.screenx + ix].r = escapetime[iy * config.screenx + ix];
-                bitmap[iy * config.screenx + ix].g = escapetime[iy * config.screenx + ix];
-                bitmap[iy * config.screenx + ix].b = escapetime[iy * config.screenx + ix];
+                bitmap[iy * config.screenx + ix].r = (int) (( escapetime[iy * config.screenx + ix] / (double) max ) * 255.0 );
+                bitmap[iy * config.screenx + ix].g = (int) (( escapetime[iy * config.screenx + ix] / (double) max ) * 255.0 );
+                bitmap[iy * config.screenx + ix].b = (int) (( escapetime[iy * config.screenx + ix] / (double) max ) * 255.0 );
             }
         }
 

@@ -1,43 +1,22 @@
 CC=gcc
-CFLAGS=-c -Wall -Wextra -g -lpng
-CFLAGSL=-lpng -fopenmp -pthread
+#CFLAGS=-Wall -Wextra -lpng -I/usr/include -L/usr/lib64 -Wl,-rpath -Wl,/usr/lib64 -lmpich -lopa -lmpl -lgmp
+CFLAGS=-lpng -lgmp -fopenmp -g
 LDFLAGS=
-PTHREAD_FLAG=-pthread
-OPENMP_FLAG=-fopenmp
 
-SOURCES=mandel.c image_utils.c mandel_processor.c
-EXECUTABLES=main main_pthreads main_openmp
-ALLSOURCES=mandel.c image_utils.c main.c main_pthreads.c main_openmp.c
+SOURCES=mandel_processor.c mandel.c main_openmp.c image_utils.c
 
 OBJECTS=$(SOURCES:.c=.o)
-ALLOBJECTS=$(ALLSOURCES:.c=.o)
+EXECUTABLE=magic
 
-all: main main_pthreads main_openmp
+all: $(SOURCES) $(EXECUTABLE)
 
-image_utils.c:
-	$(CC) $(CFLAGS) $< -o $@ $(CFLAGSL)
+$(EXECUTABLE): $(OBJECTS)
+	$(CC) $(LDFLAGS) $(OBJECTS) -o $@ $(CFLAGS)
 
-mandel.c:
-	$(CC) $(CFLAGS) $< -o $@ $(CFLAGSL)
-
-main.c: $(SOURCES)
-	$(CC) $(CFLAGS) $< -o $@ $(CFLAGSL)
-
-main_pthreads.c: $(SOURCES)
-	$(CC) $(CFLAGS) $< -o $@ $(CFLAGSL) $(PTHREAD_FLAG)
-
-main_openmp.c: $(SOURCES)
-	$(CC) $(CFLAGS) $(OPENMP_FLAG) $< -o $@ $(CFLAGSL)
-
-main: $(ALLOBJECTS)
-	$(CC) main.o $(LDFLAGS) $(OBJECTS) -o $@ $(CFLAGSL)
-
-main_pthreads: $(ALLOBJECTS)
-	$(CC) main_pthreads.o $(LDFLAGS) $(OBJECTS) -o $@ $(CFLAGSL) $(PTHREAD_FLAG)
-
-main_openmp: $(ALLOBJECTS)
-	$(CC) main_openmp.o $(LDFLAGS) $(OBJECTS) -o $@ $(CFLAGSL) $(OPENMP_FLAG)
+.cpp.o:
+	$(CC) $(CFLAGS) $< -o -c $@
 
 .PHONY: clean
 clean:
-	$(RM) $(ALLOBJECTS) $(EXECUTABLES)
+	$(RM) $(OBJECTS) $(EXECUTABLE)
+	$(RM) *.ppm

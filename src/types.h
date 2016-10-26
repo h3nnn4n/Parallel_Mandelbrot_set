@@ -1,6 +1,8 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+#include <gmp.h>
+
 typedef struct {
         double r, g, b;
 } _color;
@@ -9,11 +11,11 @@ typedef struct {
     int    bailout,
            screenx,
            screeny;
-    double minx,
+    mpf_t  minx,
            maxx,
            miny,
-           maxy,
-           er;
+           maxy;
+    double er;
 } _config;
 
 
