@@ -1,6 +1,6 @@
 CC=gcc
 #CFLAGS=-Wall -Wextra -lpng -I/usr/include -L/usr/lib64 -Wl,-rpath -Wl,/usr/lib64 -lmpich -lopa -lmpl -lgmp
-CFLAGS=-Wall -Wextra -lpng -lgmp -fopenmp
+CFLAGS=-lpng -lgmp -fopenmp -g
 LDFLAGS=
 
 SOURCES=mandel_processor.c mandel.c main_openmp.c image_utils.c

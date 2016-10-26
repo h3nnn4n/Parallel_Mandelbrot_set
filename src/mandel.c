@@ -1,3 +1,4 @@
+#include <gmp.h>
 #include "types.h"
 #include "mandel.h"
 #include "mandel_processor.h"
@@ -14,41 +15,45 @@ void fill_block(int ix_min, int ix_max, int iy_min, int iy_max, _config c, int *
 }
 
 void finish_block(int ix_min, int ix_max, int iy_min, int iy_max, _config c, int *img) {
-    int iy, ix;
-    double cx, cy;
+    // STUB TODO FIXME
+    // Port this to GMP
+    /*int iy, ix;*/
+    /*double cx, cy;*/
 
-    for(iy = iy_min; iy < iy_max; iy++ ){
-        cy = c.miny + iy*(c.maxy - c.miny) / c.screeny;
-        for ( ix = ix_min; ix < ix_max; ix++ ) {
-            cx = c.minx + ix * (c.maxx - c.minx) / c.screenx;
-            img[iy * c.screenx + ix] = process_point(cx, cy, c.er, c.bailout);
-        }
-    }
+    /*for(iy = iy_min; iy < iy_max; iy++ ){*/
+        /*cy = c.miny + iy*(c.maxy - c.miny) / c.screeny;*/
+        /*for ( ix = ix_min; ix < ix_max; ix++ ) {*/
+            /*cx = c.minx + ix * (c.maxx - c.minx) / c.screenx;*/
+            /*img[iy * c.screenx + ix] = process_point(cx, cy, c.er, c.bailout);*/
+        /*}*/
+    /*}*/
 }
 
 int check(int ix_min, int ix_max, int iy_min, int iy_max, _config c, int w, int color){
-    int iy, ix;
-    double cx, cy;
+    // STUB TODO FIXME
+    // Port this to GMP
+    /*int iy, ix;*/
+    /*double cx, cy;*/
 
-    for(iy = iy_min; iy < iy_max; iy += w ){
-        cy = c.miny + iy*(c.maxy - c.miny) / c.screeny;
+    /*for(iy = iy_min; iy < iy_max; iy += w ){*/
+        /*cy = c.miny + iy*(c.maxy - c.miny) / c.screeny;*/
 
-        if ( process_point(c.minx + (ix_max) * (c.maxx - c.minx) / c.screenx, cy, c.er, c.bailout) != color )
-            return 0;
+        /*if ( process_point(c.minx + (ix_max) * (c.maxx - c.minx) / c.screenx, cy, c.er, c.bailout) != color )*/
+            /*return 0;*/
 
-        if ( process_point(c.minx + (ix_min) * (c.maxx - c.minx) / c.screenx, cy, c.er, c.bailout) != color )
-            return 0;
-    }
+        /*if ( process_point(c.minx + (ix_min) * (c.maxx - c.minx) / c.screenx, cy, c.er, c.bailout) != color )*/
+            /*return 0;*/
+    /*}*/
 
-    for ( ix = ix_min; ix < ix_max; ix += w ) {
-        cx = c.minx + (ix) * (c.maxx - c.minx) / c.screenx;
+    /*for ( ix = ix_min; ix < ix_max; ix += w ) {*/
+        /*cx = c.minx + (ix) * (c.maxx - c.minx) / c.screenx;*/
 
-        if ( process_point(cx, c.miny + (iy_max) * (c.maxy - c.miny) / c.screeny, c.er, c.bailout) != color )
-            return 0;
+        /*if ( process_point(cx, c.miny + (iy_max) * (c.maxy - c.miny) / c.screeny, c.er, c.bailout) != color )*/
+            /*return 0;*/
 
-        if ( process_point(cx, c.miny + (iy_min) * (c.maxy - c.miny) / c.screeny, c.er, c.bailout) != color )
-            return 0;
-    }
+        /*if ( process_point(cx, c.miny + (iy_min) * (c.maxy - c.miny) / c.screeny, c.er, c.bailout) != color )*/
+            /*return 0;*/
+    /*}*/
 
     return 1;
 }
@@ -60,27 +65,49 @@ void do_block(int ix_min, int ix_max, int iy_min, int iy_max, _config c, int *im
     int dx = (ix_max - ix_min ) / 2;
     int dy = (iy_max - iy_min ) / 2;
 
-    int const eps = 6;
+    int const eps = 5;
 
-    double cx_min, cx_max;
-    double cy_min, cy_max;
+    mpf_t cy_min, cy_max,
+          cx_min, cx_max;
 
-    cx_min = c.minx + ix_min * (c.maxx - c.minx) / c.screenx;
-    cx_max = c.minx + ix_max * (c.maxx - c.minx) / c.screenx;
+    mpf_init(cx_min);
+    mpf_init(cx_max);
+    mpf_init(cy_min);
+    mpf_init(cy_max);
 
-    cy_min = c.miny + iy_min * (c.maxy - c.miny) / c.screeny;
-    cy_max = c.miny + iy_max * (c.maxy - c.miny) / c.screeny;
+    mpf_sub    ( cx_min, c.minx, c.maxx                       ) ;
+    mpf_mul_ui ( cx_min, cx_min, (unsigned long int)ix_min    ) ;
+    mpf_div_ui ( cx_min, cx_min, (unsigned long int)c.screenx ) ;
+    mpf_add    ( cx_min, cx_min, c.minx                       ) ;
+
+    mpf_sub    ( cx_max, c.minx, c.maxx                       ) ;
+    mpf_mul_ui ( cx_max, cx_max, (unsigned long int)ix_max    ) ;
+    mpf_div_ui ( cx_max, cx_max, (unsigned long int)c.screenx ) ;
+    mpf_add    ( cx_max, cx_max, c.maxx                       ) ;
+
+    mpf_sub    ( cy_min, c.miny, c.maxy                       ) ;
+    mpf_mul_ui ( cy_min, cy_min, (unsigned long int)iy_min    ) ;
+    mpf_div_ui ( cy_min, cy_min, (unsigned long int)c.screeny ) ;
+    mpf_add    ( cy_min, cy_min, c.miny                       ) ;
+
+    mpf_sub    ( cy_max, c.miny, c.maxy                       ) ;
+    mpf_mul_ui ( cy_max, cy_max, (unsigned long int)iy_max    ) ;
+    mpf_div_ui ( cy_max, cy_max, (unsigned long int)c.screeny ) ;
+    mpf_add    ( cy_max, cy_max, c.maxy                       ) ;
 
     int aa = process_point(cx_min, cy_min, c.er, c.bailout);
     int bb = process_point(cx_max, cy_max, c.er, c.bailout);
     int ab = process_point(cx_min, cy_max, c.er, c.bailout);
     int ba = process_point(cx_max, cy_min, c.er, c.bailout);
 
-    if ( aa == bb  && aa == ab && aa == ba && check(ix_min, ix_max, iy_min, iy_max, c, 5, aa) ) {
+    /*printf("%d %d %d %d\n", aa, ab, ba, bb);*/
+
+    if ( aa == bb  && aa == ab && aa == ba ) { // && check(ix_min, ix_max, iy_min, iy_max, c, 5, aa) ) {
         fill_block(ix_min, ix_max, iy_min, iy_max, c, img, aa);
     } else {
         if ( dx < eps && dy < eps ) {
-            finish_block(ix_min , ix_max     , iy_min     , iy_max     , c, img);
+            /*finish_block(ix_min , ix_max     , iy_min     , iy_max     , c, img);*/
+            fill_block(ix_min, ix_max, iy_min, iy_max, c, img, aa);
         } else if ( dy < eps ) {
             do_block(ix_min     , ix_max - dx, iy_min     , iy_max     , c, img);
             do_block(ix_min + dx, ix_max     , iy_min     , iy_max     , c, img);
@@ -94,4 +121,8 @@ void do_block(int ix_min, int ix_max, int iy_min, int iy_max, _config c, int *im
             do_block(ix_min     , ix_max - dx, iy_min + dy, iy_max     , c, img);
         }
     }
+    mpf_clear(cx_min);
+    mpf_clear(cx_max);
+    mpf_clear(cy_min);
+    mpf_clear(cy_max);
 }
