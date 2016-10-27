@@ -14,6 +14,9 @@ int main(int argc, char *argv[]) {
     int     ix, iy;
     int     *escapetime;
     int     rank, size;
+
+    double  start_time, end_time;
+
     _config config;
     _color  *bitmap;
 
@@ -38,7 +41,11 @@ int main(int argc, char *argv[]) {
     config.miny     =  0.131825904205330 - 0.000000000051299;
     config.maxy     =  0.131825904205330 + 0.000000000051299;
 
-    block_size      =  79;
+    if ( argc == 2 ) {
+        block_size = atoi(argv[1]);
+    } else {
+        block_size = 40;
+    }
 
     MPI_Status status;
     MPI_Init(&argc, &argv);
@@ -58,6 +65,7 @@ int main(int argc, char *argv[]) {
         void *outbuf =        malloc ( data_size                                               );
         int  *block  = (int*) malloc ( sizeof(int) * 4 + sizeof(int) * block_size * block_size );
 
+        start_time = MPI_Wtime();
         for ( iy = 0; iy < config.screeny; iy += block_size ) {
             for ( ix = 0; ix < config.screenx; ix += block_size ) {
                 int position = 0;
@@ -150,7 +158,11 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        MPI_Barrier(MPI_COMM_WORLD);
+        end_time = MPI_Wtime();
+
+        /*MPI_Barrier(MPI_COMM_WORLD);*/
+
+        printf("%d %f\n", size, end_time - start_time);
 
         for ( iy = 0; iy < config.screeny; iy++ ) {
             for ( ix = 0; ix < config.screenx; ix++ ) {
@@ -208,7 +220,6 @@ int main(int argc, char *argv[]) {
             block[2] = a3;
             block[3] = a4;
 
-            int y = a3;
             int ii, jj;
             int copier = 4;
             for (jj = a3; jj < a4; jj++) {
@@ -225,7 +236,6 @@ int main(int argc, char *argv[]) {
 
             MPI_Send(block, 4 + block_size * block_size, MPI_INT, status.MPI_SOURCE, 0, MPI_COMM_WORLD );
         }
-        MPI_Barrier(MPI_COMM_WORLD);
     }
 
     MPI_Finalize();
