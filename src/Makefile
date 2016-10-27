@@ -1,43 +1,19 @@
 CC=gcc
-CFLAGS=-c -Wall -Wextra -g -lpng
-CFLAGSL=-lpng -fopenmp -pthread
-LDFLAGS=
-PTHREAD_FLAG=-pthread
-OPENMP_FLAG=-fopenmp
+CFLAGS=-Wall -Wextra -g -lpng -fopenmp
 
-SOURCES=mandel.c image_utils.c mandel_processor.c
-EXECUTABLES=main main_pthreads main_openmp
-ALLSOURCES=mandel.c image_utils.c main.c main_pthreads.c main_openmp.c mandel_processor.c
+SOURCES=mandel.c image_utils.c mandel_processor.c main.c
 
 OBJECTS=$(SOURCES:.c=.o)
-ALLOBJECTS=$(ALLSOURCES:.c=.o)
+EXECUTABLE=main
 
-all: main main_pthreads main_openmp
+all: $(SOURCES) $(EXECUTABLE)
 
-image_utils.c:
-	$(CC) $(CFLAGS) $< -o $@ $(CFLAGSL)
+$(EXECUTABLE): $(OBJECTS)
+	$(CC) $(CFLAGS) $(OBJECTS) -o $@
 
-mandel.c:
-	$(CC) $(CFLAGS) $< -o $@ $(CFLAGSL)
-
-main.c: $(SOURCES)
-	$(CC) $(CFLAGS) $< -o $@ $(CFLAGSL)
-
-main_pthreads.c: $(SOURCES)
-	$(CC) $(CFLAGS) $< -o $@ $(CFLAGSL) $(PTHREAD_FLAG)
-
-main_openmp.c: $(SOURCES)
-	$(CC) $(CFLAGS) $(OPENMP_FLAG) $< -o $@ $(CFLAGSL)
-
-main: $(ALLOBJECTS)
-	$(CC) main.o $(LDFLAGS) $(OBJECTS) -o $@ $(CFLAGSL)
-
-main_pthreads: $(ALLOBJECTS)
-	$(CC) main_pthreads.o $(LDFLAGS) $(OBJECTS) -o $@ $(CFLAGSL) $(PTHREAD_FLAG)
-
-main_openmp: $(ALLOBJECTS)
-	$(CC) main_openmp.o $(LDFLAGS) $(OBJECTS) -o $@ $(CFLAGSL) $(OPENMP_FLAG)
+.c.o:
+	$(CC) $(CFLAGS) $< -c -o $@
 
 .PHONY: clean
 clean:
-	$(RM) $(ALLOBJECTS) $(EXECUTABLES)
+	$(RM) $(OBJECTS) $(EXECUTABLE)
