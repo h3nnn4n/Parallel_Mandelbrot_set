@@ -15,18 +15,31 @@ void fill_block(int ix_min, int ix_max, int iy_min, int iy_max, _config c, int *
 }
 
 void finish_block(int ix_min, int ix_max, int iy_min, int iy_max, _config c, int *img) {
-    // STUB TODO FIXME
-    // Port this to GMP
-    /*int iy, ix;*/
-    /*double cx, cy;*/
+    int iy, ix;
 
-    /*for(iy = iy_min; iy < iy_max; iy++ ){*/
+    mpf_t cy, cx;
+
+    mpf_init(cx);
+    mpf_init(cy);
+
+    for(iy = iy_min; iy < iy_max; iy++ ){
         /*cy = c.miny + iy*(c.maxy - c.miny) / c.screeny;*/
-        /*for ( ix = ix_min; ix < ix_max; ix++ ) {*/
+        mpf_sub    ( cy, c.miny, c.maxy                   ) ;
+        mpf_mul_ui ( cy, cy, (unsigned long int)iy        ) ;
+        mpf_div_ui ( cy, cy, (unsigned long int)c.screeny ) ;
+        mpf_add    ( cy, cy, c.miny                       ) ;
+        for ( ix = ix_min; ix < ix_max; ix++ ) {
             /*cx = c.minx + ix * (c.maxx - c.minx) / c.screenx;*/
-            /*img[iy * c.screenx + ix] = process_point(cx, cy, c.er, c.bailout);*/
-        /*}*/
-    /*}*/
+            mpf_sub    ( cx, c.minx, c.maxx                   ) ;
+            mpf_mul_ui ( cx, cx, (unsigned long int)ix        ) ;
+            mpf_div_ui ( cx, cx, (unsigned long int)c.screenx ) ;
+            mpf_add    ( cx, cx, c.minx                       ) ;
+            img[iy * c.screenx + ix] = process_point(cx, cy, c.er, c.bailout);
+        }
+    }
+
+    mpf_clear(cx);
+    mpf_clear(cy);
 }
 
 int check(int ix_min, int ix_max, int iy_min, int iy_max, _config c, int w, int color){
@@ -106,8 +119,8 @@ void do_block(int ix_min, int ix_max, int iy_min, int iy_max, _config c, int *im
         fill_block(ix_min, ix_max, iy_min, iy_max, c, img, aa);
     } else {
         if ( dx < eps && dy < eps ) {
-            /*finish_block(ix_min , ix_max     , iy_min     , iy_max     , c, img);*/
-            fill_block(ix_min, ix_max, iy_min, iy_max, c, img, aa);
+            finish_block(ix_min , ix_max     , iy_min     , iy_max     , c, img);
+            /*fill_block(ix_min, ix_max, iy_min, iy_max, c, img, aa);*/
         } else if ( dy < eps ) {
             do_block(ix_min     , ix_max - dx, iy_min     , iy_max     , c, img);
             do_block(ix_min + dx, ix_max     , iy_min     , iy_max     , c, img);
