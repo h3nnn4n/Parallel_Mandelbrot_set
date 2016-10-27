@@ -28,10 +28,10 @@ set style line 6 lc rgb '#98cdc5' pt 6 ps 1 lt 1 lw 2 # --- grey-cyan-thing
 
 set key top left
 
-set xlabel 'Threads'
+set xlabel 'Workers'
 set ylabel 'Aceleracao'
 
-plot 'time_omp_static'  u 1:3 t 'openmp\_static'   w lp ls 1, \
-     'time_omp_guided'  u 1:3 t 'openmp\_guided'   w lp ls 2, \
-     'time_omp_dynamic' u 1:3 t 'openmp\_dynamic'  w lp ls 3, \
-     'time_threads'     u 1:3 t 'threads'          w lp ls 4
+f(x) = x
+
+plot 'times2.dat'  u 1:3 t 'openmpi'   w lp ls 1, \
+     f(x)                t 'ideal'     w l  ls 2
