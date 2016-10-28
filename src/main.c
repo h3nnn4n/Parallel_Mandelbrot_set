@@ -17,17 +17,19 @@ int main(int argc, char *argv[]) {
     int     block_size;
     int     ix, iy;
     int     progress;
+    int     total, i;
     int     *escapetime;
+    int     *hist;
     _config config;
     _color  *bitmap, *pal;
 
     config.screenx  =  1920;
     config.screeny  =  1080;
 
-    /*config.screenx  =  800;*/
-    /*config.screeny  =  600;*/
+    config.screenx  =  800;
+    config.screeny  =  600;
 
-    config.bailout  =  10000;
+    config.bailout  =  5000;
     config.er       =  2;
     config.aa       =  5;
 
@@ -41,27 +43,30 @@ int main(int argc, char *argv[]) {
     config.miny     =  0.131825963  - 0.000014628;
     config.maxy     =  0.131825963  + 0.000014628;
 
-    config.minx     = -0.743643887037151 - 0.000000000051299;
-    config.maxx     = -0.743643887037151 + 0.000000000051299;
-    config.miny     =  0.131825904205330 - 0.000000000051299;
-    config.maxy     =  0.131825904205330 + 0.000000000051299;
+    config.minx     = -0.743643887037151 - 0.000000000051299 / 256.0;
+    config.maxx     = -0.743643887037151 + 0.000000000051299 / 256.0;
+    config.miny     =  0.131825904205330 - 0.000000000051299 / 256.0;
+    config.maxy     =  0.131825904205330 + 0.000000000051299 / 256.0;
 
     block_size      =  20;
 
     progress        =  0;
+    total           =  0;
 
     if ( argc > 1 ) {
         omp_set_num_threads(atoi(argv[1]));
     }
 
-    pal = ( _color* ) malloc ( sizeof ( _color ) * 255 ) ;
+    hist       = ( int   * ) malloc ( sizeof ( int    ) * config.bailout                  );
+    escapetime = ( int   * ) malloc ( sizeof ( int    ) * config.screenx * config.screeny );
+    bitmap     = ( _color* ) malloc ( sizeof ( _color ) * config.screenx * config.screeny );
+    pal        = ( _color* ) malloc ( sizeof ( _color ) * 255                             );
 
     populatePal ( pal ) ;
 
-    printf("%f \t %f\n%f\t %f\n", config.minx, config.maxx, config.miny, config.maxy);
+    bzero( hist, sizeof ( int ) * config.bailout );
 
-    escapetime = ( int   * ) malloc ( sizeof ( int    ) * config.screenx * config.screeny );
-    bitmap     = ( _color* ) malloc ( sizeof ( _color ) * config.screenx * config.screeny );
+    printf("%f \t %f\n%f\t %f\n", config.minx, config.maxx, config.miny, config.maxy);
 
 #pragma omp parallel for private(ix) schedule(_SCHELL_)
     for ( iy = 0; iy < config.screeny; iy += block_size ) {
@@ -74,16 +79,26 @@ int main(int argc, char *argv[]) {
     int max = 0;
     for ( iy = 0; iy < config.screeny; iy++ ) {
         for ( ix = 0; ix < config.screenx; ix++ ) {
+            hist[escapetime[iy * config.screenx + ix]]++;
             max = max < escapetime[iy * config.screenx + ix] ? escapetime[iy * config.screenx + ix] : max;
         }
     }
+
+    for ( i = 0; i < config.bailout; ++i) {
+        total += hist[i];
+    }
+
+    for ( i = 0; i < config.bailout - 1; ++i) {
+        hist[i] += hist[i-1];
+    }
+
 
     for ( iy = 0; iy < config.screeny; iy++ ) {
         for ( ix = 0; ix < config.screenx; ix++ ) {
             if ( escapetime[iy * config.screenx + ix] == 0 ) {
 
             } else {
-                bitmap[iy * config.screenx + ix] = getPalMem(escapetime[iy * config.screenx + ix] / (double)max, pal);
+                bitmap[iy * config.screenx + ix] = getPalMem(hist[escapetime[iy * config.screenx + ix]]/(double)total, pal);
             }
 
             /*bitmap[iy * config.screenx + ix].r = (int)((escapetime[iy * config.screenx + ix] / (double)max) * 255.0);*/
