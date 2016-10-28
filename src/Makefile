@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -Wextra -g -lpng -fopenmp
+CFLAGS=-Wall -Wextra -g -lpng -fopenmp -lm
 
 SOURCES=mandel.c image_utils.c mandel_processor.c main.c
 

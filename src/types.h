@@ -6,7 +6,8 @@ typedef struct {
 } _color;
 
 typedef struct {
-    int    bailout,
+    int    aa,
+           bailout,
            screenx,
            screeny;
     double minx,

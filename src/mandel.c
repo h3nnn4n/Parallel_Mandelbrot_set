@@ -21,7 +21,7 @@ void finish_block(int ix_min, int ix_max, int iy_min, int iy_max, _config c, int
         cy = c.miny + iy*(c.maxy - c.miny) / c.screeny;
         for ( ix = ix_min; ix < ix_max; ix++ ) {
             cx = c.minx + ix * (c.maxx - c.minx) / c.screenx;
-            img[iy * c.screenx + ix] = process_point(cx, cy, c.er, c.bailout);
+            img[iy * c.screenx + ix] = process_point_aa(cx, cy, c.er, c.bailout, c.aa, c);
         }
     }
 }
@@ -76,7 +76,7 @@ void do_block(int ix_min, int ix_max, int iy_min, int iy_max, _config c, int *im
     int ab = process_point(cx_min, cy_max, c.er, c.bailout);
     int ba = process_point(cx_max, cy_min, c.er, c.bailout);
 
-    if ( aa == bb  && aa == ab && aa == ba && check(ix_min, ix_max, iy_min, iy_max, c, 5, aa) ) {
+    if ( aa == bb  && aa == ab && aa == ba && check(ix_min, ix_max, iy_min, iy_max, c, 2, aa) ) {
         fill_block(ix_min, ix_max, iy_min, iy_max, c, img, aa);
     } else {
         if ( dx < eps && dy < eps ) {
