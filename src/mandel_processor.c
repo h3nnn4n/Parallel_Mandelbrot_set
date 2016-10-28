@@ -28,7 +28,6 @@ int process_point(double cx, double cy, int er, int bailout) {
     double zx , zxn , zy , zyn;
     double zx2, zxn2, zy2, zyn2;
 
-    er *= 20;
     double dist = 1e4;
 
     zx  = 0.0;

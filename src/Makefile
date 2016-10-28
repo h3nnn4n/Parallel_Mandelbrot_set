@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-Wall -Wextra -g -lpng -fopenmp -lm
 
-SOURCES=mandel.c image_utils.c mandel_processor.c main.c
+SOURCES=mandel.c image_utils.c mandel_processor.c main.c color.c
 
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=main

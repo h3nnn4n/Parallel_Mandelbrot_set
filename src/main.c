@@ -4,6 +4,7 @@
 #include <string.h>
 #include <omp.h>
 
+#include "color.h"
 #include "types.h"
 #include "mandel.h"
 #include "image_utils.h"
@@ -15,13 +16,18 @@
 int main(int argc, char *argv[]) {
     int     block_size;
     int     ix, iy;
+    int     progress;
     int     *escapetime;
     _config config;
-    _color  *bitmap;
+    _color  *bitmap, *pal;
 
-    config.screenx  = 1920;
-    config.screeny  = 1080;
-    config.bailout  = 5000;
+    config.screenx  =  1920;
+    config.screeny  =  1080;
+
+    /*config.screenx  =  800;*/
+    /*config.screeny  =  600;*/
+
+    config.bailout  =  10000;
     config.er       =  2;
     config.aa       =  5;
 
@@ -42,9 +48,15 @@ int main(int argc, char *argv[]) {
 
     block_size      =  20;
 
+    progress        =  0;
+
     if ( argc > 1 ) {
         omp_set_num_threads(atoi(argv[1]));
     }
+
+    pal = ( _color* ) malloc ( sizeof ( _color ) * 255 ) ;
+
+    populatePal ( pal ) ;
 
     printf("%f \t %f\n%f\t %f\n", config.minx, config.maxx, config.miny, config.maxy);
 
@@ -56,7 +68,7 @@ int main(int argc, char *argv[]) {
         for ( ix = 0; ix < config.screenx; ix += block_size ) {
             do_block(ix, ix+block_size, iy, iy+block_size, config, escapetime);
         }
-        fprintf(stderr," -- %.2f%%\n",(iy/(double)config.screeny)*100.0);
+        fprintf(stderr," -- %.2f%%\n",((progress += block_size)/(double)config.screeny)*100.0);
     }
 
     int max = 0;
@@ -66,13 +78,18 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    /*max = 255;*/
-
     for ( iy = 0; iy < config.screeny; iy++ ) {
         for ( ix = 0; ix < config.screenx; ix++ ) {
-            bitmap[iy * config.screenx + ix].r = (int)((escapetime[iy * config.screenx + ix] / (double)max) * 255.0);
-            bitmap[iy * config.screenx + ix].g = (int)((escapetime[iy * config.screenx + ix] / (double)max) * 255.0);
-            bitmap[iy * config.screenx + ix].b = (int)((escapetime[iy * config.screenx + ix] / (double)max) * 255.0);
+            if ( escapetime[iy * config.screenx + ix] == 0 ) {
+
+            } else {
+                bitmap[iy * config.screenx + ix] = getPalMem(escapetime[iy * config.screenx + ix] / (double)max, pal);
+            }
+
+            /*bitmap[iy * config.screenx + ix].r = (int)((escapetime[iy * config.screenx + ix] / (double)max) * 255.0);*/
+            /*bitmap[iy * config.screenx + ix].g = (int)((escapetime[iy * config.screenx + ix] / (double)max) * 255.0);*/
+            /*bitmap[iy * config.screenx + ix].b = (int)((escapetime[iy * config.screenx + ix] / (double)max) * 255.0);*/
+
             /*bitmap[iy * config.screenx + ix].r = escapetime[iy * config.screenx + ix];*/
             /*bitmap[iy * config.screenx + ix].g = escapetime[iy * config.screenx + ix];*/
             /*bitmap[iy * config.screenx + ix].b = escapetime[iy * config.screenx + ix];*/
